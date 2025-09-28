@@ -1,0 +1,224 @@
+openapi: 3.0.0
+info:
+  title: DSecure API
+  version: 1.0.0
+  description: API for DSecure data erasure and security platform, powered by Supabase.
+servers:
+  - url: /api
+paths:
+  /profiles:
+    get:
+      summary: Get current user profile
+      tags: [Profiles]
+      responses:
+        '200':
+          description: User profile data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Profile'
+    patch:
+      summary: Update current user profile
+      tags: [Profiles]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+      responses:
+        '200':
+          description: Updated user profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Profile'
+
+  /plans:
+    get:
+      summary: Get all pricing plans
+      tags: [Billing]
+      responses:
+        '200':
+          description: A list of pricing plans
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Plan'
+
+  /subscriptions:
+    get:
+      summary: Get current user's subscription
+      tags: [Billing]
+      responses:
+        '200':
+          description: The user's subscription details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subscription'
+
+  /devices:
+    get:
+      summary: Get all devices for the current user
+      tags: [Devices]
+      responses:
+        '200':
+          description: A list of devices
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Device'
+    post:
+      summary: Add a new device
+      tags: [Devices]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeviceInput'
+      responses:
+        '201':
+          description: Device created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Device'
+
+  /erasure_jobs:
+    get:
+      summary: Get all erasure jobs for the current user
+      tags: [Erasure]
+      responses:
+        '200':
+          description: A list of erasure jobs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ErasureJob'
+    post:
+      summary: Start a new erasure job
+      tags: [Erasure]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                device_id:
+                  type: string
+                  format: uuid
+                algorithm:
+                  type: string
+      responses:
+        '201':
+          description: Erasure job started
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErasureJob'
+
+  /audit_reports:
+    get:
+      summary: Get all audit reports for the current user
+      tags: [Reports]
+      responses:
+        '200':
+          description: A list of audit reports
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AuditReport'
+
+components:
+  schemas:
+    Profile:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        updated_at:
+          type: string
+          format: date-time
+    Plan:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        price:
+          type: integer
+        features:
+          type: object
+    Subscription:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          format: uuid
+        plan_id:
+          type: string
+        status:
+          type: string
+    Device:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        type:
+          type: string
+        size:
+          type: string
+    DeviceInput:
+      type: object
+      properties:
+        name:
+          type: string
+        type:
+          type: string
+        size:
+          type: string
+    ErasureJob:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        device_id:
+          type: string
+          format: uuid
+        status:
+          type: string
+        progress:
+          type: integer
+    AuditReport:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        job_id:
+          type: string
+          format: uuid
+        certificate_data:
+          type: object
